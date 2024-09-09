@@ -1,0 +1,113 @@
+<div [ngClass]="{'pointer-events-none opacity-50': isModalOpened}" class="flex flex-col gap-5 w-full items-center">
+
+  <div class="w-full">
+    <button
+      class="w-full bg-white flex text-xl text-teal-700 font-bold items-center justify-center border-2 border-teal-700 rounded-lg shadow-md p-6 hover:bg-gray-200"
+      (click)="openMusicModal()"
+    >
+      ADD MUSIC
+    </button>
+  </div>
+
+  <ul class="w-full flex flex-col justify-center gap-1">
+    @for (music of musics; track music.id) {
+      <li class="max-w-full flex cursor-pointer justify-between">
+        <app-music-card [music]="music" (click)="loadMusicForm(music)"
+                        class="flex min-w-[220px] w-full bg-teal-600 border border-teal-50 rounded-lg shadow-md p-6 hover:bg-teal-700 hover:rounded-lg"
+        ></app-music-card>
+        <!-- PLAY BUTTON -->
+        <a
+          class="w-24 min-w-24 flex items-center justify-center bg-white border-2 border-teal-700 rounded-lg text-teal-700 font-bold hover:bg-teal-700 hover:text-white hover:border-white"
+          [href]="music.link" target="_blank"
+        >
+          PLAY
+        </a>
+      </li>
+    }
+  </ul>
+
+</div>
+
+<app-music-modal [visible]="isModalOpened">
+  @if (isModalOpened) {
+    <div class="fixed inset-0 mt-[25vh] bg-white h-[40vh] p-6 rounded-lg shadow-lg max-w-sm sm:max-w-xl mx-auto border-2 border-teal-800">
+      <div class="flex justify-between items-baseline">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-900">Music</h2>
+        <button class="text-xl" (click)="closeModal()">
+          Cancel
+        </button>
+      </div>
+      <form
+        action=""
+        [formGroup]="musicForm"
+        (ngSubmit)="submit()"
+      >
+        <!-- Campo para o título da música -->
+        <div class="mb-4">
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+          <input
+            id="title"
+            type="text"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Type the title of your music"
+            name="title"
+            formControlName="title"
+            [class]="{
+                invalid: musicForm.get('title')?.hasError('required') && musicForm.get('title')?.touched,
+                valid: musicForm.get('title')?.valid,
+				      }"
+          >
+          @if (musicForm.get("title")?.hasError("required") && musicForm.get("title")?.touched) {
+            <span class="form-error">Title is required.</span>
+          }
+        </div>
+
+        <!-- Campo para o link da música -->
+        <div class="mb-6">
+          <label for="link" class="block text-sm font-medium text-gray-700 mb-1">Link</label>
+          <input
+            id="link"
+            type="url"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Type the link of your music"
+            name="link"
+            formControlName="link"
+            [class]="{
+                invalid: musicForm.get('link')?.hasError('required') && musicForm.get('link')?.touched,
+                valid: musicForm.get('link')?.valid,
+              }"
+          >
+          @if (musicForm.get("link")?.hasError("required") && musicForm.get("link")?.touched) {
+            <span class="form-error">Link is required.</span>
+          }
+        </div>
+
+        @if (isUpdate) {
+          <!-- Botão para editar música -->
+          <div class="flex gap-2">
+            <button type="submit"
+                    class="w-full bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition-colors"
+                    (click)="setActionFormTo(FORM_ACTION.UPDATE)"
+            >
+              Edit Music
+            </button>
+            <button type="submit"
+                    class="w-full text-teal-700 border-2 border-teal-700 hover:text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+                    (click)="setActionFormTo(FORM_ACTION.DELETE)"
+            >
+              Delete Music
+            </button>
+          </div>
+        } @else {
+          <!-- Botão para adicionar música -->
+          <button type="submit"
+                  class="w-full bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800 transition-colors"
+                  (click)="setActionFormTo(FORM_ACTION.ADD)"
+          >
+            Add Music
+          </button>
+        }
+      </form>
+    </div>
+  }
+</app-music-modal>
