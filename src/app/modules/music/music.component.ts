@@ -6,6 +6,7 @@ import {MusicCardComponent} from "../components/music-card/music-card.component"
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {SubSink} from "subsink";
 import {NgClass} from "@angular/common";
+import {ToastrService} from "ngx-toastr";
 
 export enum FORM_ACTION {
   ADD = "ADD",
@@ -42,6 +43,7 @@ export class MusicComponent implements OnInit, OnDestroy {
   public constructor(
     private musicService: MusicService,
     private formBuilder: FormBuilder,
+    private toastrService: ToastrService,
   ) {
     this.musicForm = this.formBuilder.group({
       title: new FormControl('', {
@@ -72,7 +74,6 @@ export class MusicComponent implements OnInit, OnDestroy {
   }
 
   public loadMusicForm(music: Music) {
-    console.log({music});
     this.musicId = music.id!;
     this.musicForm.patchValue({
       title: music.title,
@@ -120,6 +121,7 @@ export class MusicComponent implements OnInit, OnDestroy {
           complete: () => {
             this.musicForm.reset();
             this.closeModal();
+            this.toastrService.success("You added a new Music.", "SUCCESS");
           },
           next: (value) => {
             const music = value as Music;
@@ -127,6 +129,7 @@ export class MusicComponent implements OnInit, OnDestroy {
           },
           error: (err: any) => {
             console.error(err.message);
+            this.toastrService.error("You can't add a new Music.", "ERROR");
           },
         });
     } else {
@@ -141,6 +144,7 @@ export class MusicComponent implements OnInit, OnDestroy {
         complete: () => {
           this.musicForm.reset();
           this.closeModal();
+          this.toastrService.success("You updated a Music.", "UPDATE");
         },
         next: (value) => {
           const index = this.musics.findIndex((music) => value.data?.updateMusic.id === music.id);
@@ -157,6 +161,7 @@ export class MusicComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           console.error(err.message);
+          this.toastrService.error("You can't update this Music.", "ERROR");
         },
       });
     this.closeModal();
@@ -168,6 +173,7 @@ export class MusicComponent implements OnInit, OnDestroy {
       .subscribe({
         complete: () => {
           this.musics = this.musics.filter(music => music.id !== musicId);
+          this.toastrService.success("You deleted a Music.", "DELETE");
         },
       });
     this.closeModal();
